@@ -1,3 +1,4 @@
+require 'pry'
 class ApplicationController < Sinatra::Base
   register Sinatra::ActiveRecordExtension
   set :views, Proc.new { File.join(root, "../views/") }
@@ -20,6 +21,8 @@ class ApplicationController < Sinatra::Base
     @user = User.new(name: params["name"], email: params["email"], password: params["password"])
     @user.save
     session[:user_id] = @user.id
+    
+    puts params
 
     redirect '/users/home'
   end
@@ -27,16 +30,19 @@ class ApplicationController < Sinatra::Base
   get '/sessions/login' do
 
     # the line of code below render the view page in app/views/sessions/login.erb
+   # erb '/sessions/login'
     erb :'sessions/login'
   end
 
   post '/sessions' do
+    puts params 
     @user = User.find_by(email: params[:email], password: params[:password])
     if @user
       session[:user_id] = @user.id
-      redirect '/users/home'
+      redirect to '/users/home'
     end
-    redirect '/sessions/login'
+    redirect to '/sessions/login'
+    puts params 
   end
 
   get '/sessions/logout' do
@@ -45,7 +51,6 @@ class ApplicationController < Sinatra::Base
   end
 
   get '/users/home' do
-
     @user = User.find(session[:user_id])
     erb :'/users/home'
   end
